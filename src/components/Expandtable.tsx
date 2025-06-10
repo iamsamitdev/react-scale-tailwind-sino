@@ -1,7 +1,15 @@
 import { useState, useEffect } from "react"
 import axios from "axios"
-import { useReactTable, getCoreRowModel, getExpandedRowModel, flexRender, getPaginationRowModel } from '@tanstack/react-table';
-import type { ColumnDef } from '@tanstack/react-table';
+import { 
+  useReactTable, 
+  getCoreRowModel, 
+  getExpandedRowModel, 
+  flexRender, 
+  getPaginationRowModel,
+  getSortedRowModel,
+  getFilteredRowModel
+} from '@tanstack/react-table';
+import type { ColumnDef, SortingState, ColumnFiltersState } from '@tanstack/react-table';
 import React from "react";
 
 // กำหนด interface สำหรับข้อมูล
@@ -27,6 +35,11 @@ function Expandtable() {
   const [loading, setLoading] = useState(false)
   const [loadingComments, setLoadingComments] = useState<Record<number, boolean>>({})
   const [error, setError] = useState<string | null>(null)
+  
+  // State สำหรับ Table features
+  const [sorting, setSorting] = useState<SortingState>([])
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+  const [globalFilter, setGlobalFilter] = useState('')
 
   // ดึงข้อมูลหลัก (posts) เมื่อ component mount
   useEffect(() => {
@@ -65,14 +78,63 @@ function Expandtable() {
 
   const columns: ColumnDef<Post>[] = [
     {
-      header: "ID",
+      header: ({ column }) => (
+        <div className="flex items-center space-x-2">
+          <span>ID</span>
+          <button
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="ml-2 text-gray-400 hover:text-gray-600"
+          >
+            {column.getIsSorted() === "asc" ? (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+              </svg>
+            ) : column.getIsSorted() === "desc" ? (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            ) : (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+              </svg>
+            )}
+          </button>
+        </div>
+      ),
       accessorKey: 'id',
       cell: ({ getValue }) => <span className="font-medium">{String(getValue())}</span>,
+      enableSorting: true,
+      enableColumnFilter: true,
     },
     {
-      header: 'Title',
+      header: ({ column }) => (
+        <div className="flex items-center space-x-2">
+          <span>Title</span>
+          <button
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="ml-2 text-gray-400 hover:text-gray-600"
+          >
+            {column.getIsSorted() === "asc" ? (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+              </svg>
+            ) : column.getIsSorted() === "desc" ? (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            ) : (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+              </svg>
+            )}
+          </button>
+        </div>
+      ),
       accessorKey: 'title',
       cell: ({ getValue }) => <span className="font-medium text-gray-900">{String(getValue())}</span>,
+      enableSorting: true,
+      enableColumnFilter: true,
+      enableGlobalFilter: true,
     },
     {
       header: 'Body',
@@ -80,20 +142,45 @@ function Expandtable() {
       cell: ({ getValue }) => (
         <span className="line-clamp-2 text-gray-600">{String(getValue())}</span>
       ),
+      enableSorting: false,
+      enableColumnFilter: false,
+      enableGlobalFilter: true,
+    },
+    {
+      header: 'User ID',
+      accessorKey: 'userId',
+      cell: ({ getValue }) => (
+        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+          User {String(getValue())}
+        </span>
+      ),
+      enableSorting: true,
+      enableColumnFilter: true,
+      filterFn: 'equals',
     },
   ]
 
   // สร้างตารางด้วย TanStack Table
   const table = useReactTable({
-    data, // ใช้ข้อมูลหลักที่ดึงมา
-    columns, // กำหนด columns ที่สร้างขึ้น
-    getCoreRowModel: getCoreRowModel(), // ใช้สำหรับการแสดงผลข้อมูลหลัก
-    getExpandedRowModel: getExpandedRowModel(), // ใช้สำหรับการขยายแถว
-    getPaginationRowModel: getPaginationRowModel(), // เพิ่มสำหรับ pagination
-    getRowCanExpand: () => true, // ทุกแถวสามารถขยายได้
+    data,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getExpandedRowModel: getExpandedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getRowCanExpand: () => true,
+    state: {
+      sorting,
+      columnFilters,
+      globalFilter,
+    },
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    onGlobalFilterChange: setGlobalFilter,
     initialState: {
       pagination: {
-        pageSize: 20, // กำหนดให้แสดง 20 รายการต่อหน้า
+        pageSize: 20,
       },
     },
   });
@@ -102,8 +189,59 @@ function Expandtable() {
     <div className="container mx-auto p-6">
       <div className="bg-white rounded-lg shadow-lg">
         <div className="p-6 border-b border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-900">Posts & Comments</h2>
-          <p className="text-gray-600 mt-1">Click on any row to expand and view comments</p>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">Posts & Comments</h2>
+              <p className="text-gray-600 mt-1">Click on any row to expand and view comments</p>
+            </div>
+            
+            {/* Search and Filter Controls */}
+            <div className="flex flex-col sm:flex-row gap-3">
+              {/* Global Search */}
+              <div className="relative">
+                <input
+                  type="text"
+                  value={globalFilter ?? ''}
+                  onChange={(e) => setGlobalFilter(e.target.value)}
+                  placeholder="Search all columns..."
+                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                />
+                <svg 
+                  className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+
+              {/* User ID Filter */}
+              <select
+                value={(table.getColumn('userId')?.getFilterValue() as string) ?? ''}
+                onChange={(e) => table.getColumn('userId')?.setFilterValue(e.target.value || undefined)}
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              >
+                <option value="">All Users</option>
+                {Array.from({ length: 10 }, (_, i) => (
+                  <option key={i + 1} value={i + 1}>
+                    User {i + 1}
+                  </option>
+                ))}
+              </select>
+
+              {/* Clear Filters Button */}
+              <button
+                onClick={() => {
+                  setGlobalFilter('')
+                  setColumnFilters([])
+                }}
+                className="px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+              >
+                Clear Filters
+              </button>
+            </div>
+          </div>
         </div>
         
         {error && (
@@ -132,6 +270,42 @@ function Expandtable() {
           </div>
         ) : (
           <div className="overflow-hidden">
+            {/* Column Filters */}
+            <div className="bg-gray-50 px-6 py-3 border-b border-gray-200">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Filter by ID</label>
+                  <input
+                    type="text"
+                    value={(table.getColumn('id')?.getFilterValue() as string) ?? ''}
+                    onChange={(e) => table.getColumn('id')?.setFilterValue(e.target.value || undefined)}
+                    placeholder="Filter ID..."
+                    className="w-full px-3 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Filter by Title</label>
+                  <input
+                    type="text"
+                    value={(table.getColumn('title')?.getFilterValue() as string) ?? ''}
+                    onChange={(e) => table.getColumn('title')?.setFilterValue(e.target.value || undefined)}
+                    placeholder="Filter title..."
+                    className="w-full px-3 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Filter by User ID</label>
+                  <input
+                    type="text"
+                    value={(table.getColumn('userId')?.getFilterValue() as string) ?? ''}
+                    onChange={(e) => table.getColumn('userId')?.setFilterValue(e.target.value || undefined)}
+                    placeholder="Filter user ID..."
+                    className="w-full px-3 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+              </div>
+            </div>
+
             <table className="min-w-full divide-y divide-gray-200">
                 <thead>
                     {table.getHeaderGroups().map((headerGroup) => (
@@ -211,7 +385,7 @@ function Expandtable() {
             
             {/* Pagination Controls */}
             <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                 {/* Page Info */}
                 <div className="flex items-center space-x-2 text-sm text-gray-700">
                   <span>
@@ -221,111 +395,118 @@ function Expandtable() {
                       table.getFilteredRowModel().rows.length
                     )}{' '}
                     of {table.getFilteredRowModel().rows.length} results
+                    {table.getFilteredRowModel().rows.length !== data.length && (
+                      <span className="text-blue-600">
+                        {' '}(filtered from {data.length} total)
+                      </span>
+                    )}
                   </span>
                 </div>
 
                 {/* Pagination Buttons */}
-                <div className="flex items-center space-x-2">
-                  {/* First Page */}
-                  <button
-                    onClick={() => table.setPageIndex(0)}
-                    disabled={!table.getCanPreviousPage()}
-                    className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-                    title="First page"
-                  >
-                    «
-                  </button>
+                <div className="flex flex-col sm:flex-row items-center gap-4">
+                  <div className="flex items-center space-x-2">
+                    {/* First Page */}
+                    <button
+                      onClick={() => table.setPageIndex(0)}
+                      disabled={!table.getCanPreviousPage()}
+                      className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                      title="First page"
+                    >
+                      «
+                    </button>
 
-                  {/* Previous Page */}
-                  <button
-                    onClick={() => table.previousPage()}
-                    disabled={!table.getCanPreviousPage()}
-                    className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-                    title="Previous page"
-                  >
-                    ‹
-                  </button>
+                    {/* Previous Page */}
+                    <button
+                      onClick={() => table.previousPage()}
+                      disabled={!table.getCanPreviousPage()}
+                      className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                      title="Previous page"
+                    >
+                      ‹
+                    </button>
 
-                  {/* Page Numbers */}
-                  <div className="flex items-center space-x-1">
-                    {(() => {
-                      const currentPage = table.getState().pagination.pageIndex + 1;
-                      const totalPages = table.getPageCount();
-                      const pages = [];
-                      
-                      // แสดงหน้าแรก
-                      if (currentPage > 3) {
-                        pages.push(1);
-                        if (currentPage > 4) pages.push('...');
-                      }
-                      
-                      // แสดงหน้าใกล้เคียง
-                      for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
-                        pages.push(i);
-                      }
-                      
-                      // แสดงหน้าสุดท้าย
-                      if (currentPage < totalPages - 2) {
-                        if (currentPage < totalPages - 3) pages.push('...');
-                        pages.push(totalPages);
-                      }
-                      
-                      return pages.map((page, index) => (
-                        page === '...' ? (
-                          <span key={`ellipsis-${index}`} className="px-2 text-gray-500">...</span>
-                        ) : (
-                          <button
-                            key={page}
-                            onClick={() => table.setPageIndex(Number(page) - 1)}
-                            className={`px-3 py-1 text-sm border rounded-md ${
-                              currentPage === page
-                                ? 'bg-blue-500 text-white border-blue-500'
-                                : 'border-gray-300 hover:bg-gray-100'
-                            }`}
-                          >
-                            {page}
-                          </button>
-                        )
-                      ));
-                    })()}
+                    {/* Page Numbers */}
+                    <div className="flex items-center space-x-1">
+                      {(() => {
+                        const currentPage = table.getState().pagination.pageIndex + 1;
+                        const totalPages = table.getPageCount();
+                        const pages = [];
+                        
+                        // แสดงหน้าแรก
+                        if (currentPage > 3) {
+                          pages.push(1);
+                          if (currentPage > 4) pages.push('...');
+                        }
+                        
+                        // แสดงหน้าใกล้เคียง
+                        for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
+                          pages.push(i);
+                        }
+                        
+                        // แสดงหน้าสุดท้าย
+                        if (currentPage < totalPages - 2) {
+                          if (currentPage < totalPages - 3) pages.push('...');
+                          pages.push(totalPages);
+                        }
+                        
+                        return pages.map((page, index) => (
+                          page === '...' ? (
+                            <span key={`ellipsis-${index}`} className="px-2 text-gray-500">...</span>
+                          ) : (
+                            <button
+                              key={page}
+                              onClick={() => table.setPageIndex(Number(page) - 1)}
+                              className={`px-3 py-1 text-sm border rounded-md ${
+                                currentPage === page
+                                  ? 'bg-blue-500 text-white border-blue-500'
+                                  : 'border-gray-300 hover:bg-gray-100'
+                              }`}
+                            >
+                              {page}
+                            </button>
+                          )
+                        ));
+                      })()}
+                    </div>
+
+                    {/* Next Page */}
+                    <button
+                      onClick={() => table.nextPage()}
+                      disabled={!table.getCanNextPage()}
+                      className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                      title="Next page"
+                    >
+                      ›
+                    </button>
+
+                    {/* Last Page */}
+                    <button
+                      onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+                      disabled={!table.getCanNextPage()}
+                      className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                      title="Last page"
+                    >
+                      »
+                    </button>
                   </div>
 
-                  {/* Next Page */}
-                  <button
-                    onClick={() => table.nextPage()}
-                    disabled={!table.getCanNextPage()}
-                    className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-                    title="Next page"
-                  >
-                    ›
-                  </button>
-
-                  {/* Last Page */}
-                  <button
-                    onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-                    disabled={!table.getCanNextPage()}
-                    className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-                    title="Last page"
-                  >
-                    »
-                  </button>
-                </div>
-
-                {/* Page Size Selector */}
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm text-gray-700">Show:</span>
-                  <select
-                    value={table.getState().pagination.pageSize}
-                    onChange={(e) => table.setPageSize(Number(e.target.value))}
-                    className="px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    {[10, 20, 30, 50, 100].map((pageSize) => (
-                      <option key={pageSize} value={pageSize}>
-                        {pageSize}
-                      </option>
-                    ))}
-                  </select>
-                  <span className="text-sm text-gray-700">entries</span>
+                  {/* Page Size Selector */}
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm text-gray-700">Show:</span>
+                    <select
+                      value={table.getState().pagination.pageSize}
+                      onChange={(e) => table.setPageSize(Number(e.target.value))}
+                      className="px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      {[10, 20, 30, 50, 100].map((pageSize) => (
+                        <option key={pageSize} value={pageSize}>
+                          {pageSize}
+                        </option>
+                      ))}
+                    </select>
+                    <span className="text-sm text-gray-700">entries</span>
+                  </div>
                 </div>
               </div>
             </div>
