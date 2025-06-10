@@ -11,6 +11,7 @@ import Register from "../pages/Register"
 import BackendLayout from "../layouts/BackendLayout"
 import Dashboard from "../pages/dashboard/Dashboard"
 import ProtectedRoute from "./ProtectedRoute"
+import User from "../pages/dashboard/User"
 
 const router = createBrowserRouter([
     // Main route with layout
@@ -55,9 +56,9 @@ const router = createBrowserRouter([
             }
         ]
     },
-    // Backend route with layout (เฉพาะ Admin - role 2)
+    // Admin route with layout (เฉพาะ Admin - role 1)
     {
-        path: "/backend",
+        path: "/admin",
         element: (
             <ProtectedRoute 
                 requiredRole={1} 
@@ -75,6 +76,37 @@ const router = createBrowserRouter([
             {
                 path: "dashboard",
                 element: <Dashboard />
+            },
+            {
+                path: "user",
+                element: <User />
+            }
+        ]
+    },
+    // User backend route (เฉพาะ User - role 2)
+    {
+        path: "/user",
+        element: (
+            <ProtectedRoute 
+                requiredRole={2} 
+                redirectPath="/login"
+                fallbackPath="/"
+            >
+                <BackendLayout />
+            </ProtectedRoute>
+        ),
+        children: [
+            {
+                index: true,
+                element: <Dashboard />
+            },
+            {
+                path: "dashboard",
+                element: <Dashboard />
+            },
+            {
+                path: "profile",
+                element: <User />
             }
         ]
     },

@@ -27,8 +27,18 @@ function Login() {
           localStorage.setItem('user', JSON.stringify(response.data.user))
           localStorage.setItem('token', response.data.token)
 
-          // ทำการเปลี่ยนเส้นทางไปยังหน้าอื่นหลังจากเข้าสู่ระบบสำเร็จ
-          window.location.href = '/backend/dashboard'
+          // ทำการเปลี่ยนเส้นทางตาม role
+          const userRole = response.data.user.role
+          if (userRole === 1) {
+            // Admin (role 1) -> ไปหน้า admin
+            window.location.href = '/admin/dashboard'
+          } else if (userRole === 2) {
+            // User (role 2) -> ไปหน้า user
+            window.location.href = '/user/dashboard'
+          } else {
+            // กรณีอื่นๆ ไปหน้าหลัก
+            window.location.href = '/dashboard'
+          }
         })
       } else {
         Swal.fire({
