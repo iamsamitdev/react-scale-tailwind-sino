@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router'
 import DarkSwitch from './DarkSwitch'
+import { getCurrentUser } from '../routes/ProtectedRoute'
 
 // กำหนด interface สำหรับ SVG props
 interface IconProps extends React.SVGProps<SVGSVGElement> {
@@ -12,9 +13,22 @@ export default function TopBar() {
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
-  // อ่านข้อมูล user จาก localStorage
-  const userData = localStorage.getItem('user')
-  const currentUser = userData ? JSON.parse(userData) : { avatar: null, fullname: 'Guest', username: 'guest' }
+  // ใช้ getCurrentUser จาก ProtectedRoute
+  const currentUser = getCurrentUser()
+  const userRole = currentUser?.role || 0
+
+  // สร้างฟังก์ชันสำหรับสร้าง path ตาม role
+  const getProfilePath = () => {
+    if (userRole === 1) return '/backend/admin/profile' // Admin profile
+    if (userRole === 2) return '/backend/user/profile' // User profile  
+    return '/dashboard'
+  }
+
+  const getSettingsPath = () => {
+    if (userRole === 1) return '/backend/admin/settings'
+    if (userRole === 2) return '/backend/user/settings'
+    return '/dashboard'
+  }
 
   // Click outside handler
   useEffect(() => {
@@ -83,21 +97,24 @@ export default function TopBar() {
                 alt="Profile"
               />
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                {currentUser?.fullname} ({currentUser?.username})
+                {currentUser?.fullname || 'Guest'} ({currentUser?.username || 'guest'})
+              </span>
+              <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">
+                ({userRole === 1 ? 'Admin' : userRole === 2 ? 'User' : 'Guest'})
               </span>
             </button>
 
             {isProfileOpen && (
               <div className="absolute right-0 mt-2 w-48 py-1 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-50">
                 <Link
-                  to="/dashboard/profile"
+                  to={getProfilePath()}
                   onClick={handleMenuClick}
                   className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
                   โปรไฟล์
                 </Link>
                 <Link
-                  to="/dashboard/settings"
+                  to={getSettingsPath()}
                   onClick={handleMenuClick}
                   className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                 >

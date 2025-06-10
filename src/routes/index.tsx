@@ -13,6 +13,12 @@ import Dashboard from "../pages/dashboard/Dashboard"
 import ProtectedRoute from "./ProtectedRoute"
 import User from "../pages/dashboard/User"
 import Team from "../pages/dashboard/Team"
+import Projects from "../pages/dashboard/Projects"
+import Calendar from "../pages/dashboard/Calendar"
+import Documents from "../pages/dashboard/Documents"
+import Reports from "../pages/dashboard/Reports"
+import Settings from "../pages/dashboard/Settings"
+import Profile from "../pages/dashboard/Profile"
 
 const router = createBrowserRouter([
     // Main route with layout
@@ -88,27 +94,27 @@ const router = createBrowserRouter([
             },
             {
                 path: "projects",
-                element: <div>Projects Page</div>
+                element: <Projects />
             },
             {
                 path: "calendar",
-                element: <div>Calendar Page</div>
+                element: <Calendar />
             },
             {
                 path: "documents",
-                element: <div>Documents Page</div>
+                element: <Documents />
             },
             {
                 path: "reports",
-                element: <div>Reports Page</div>
+                element: <Reports />
             },
             {
-                path: "user",
-                element: <User />
+                path: "profile",
+                element: <Profile />
             },
             {
                 path: "settings",
-                element: <div>Admin Settings Page</div>
+                element: <Settings />
             }
         ]
     },
@@ -139,19 +145,19 @@ const router = createBrowserRouter([
             },
             {
                 path: "projects",
-                element: <div>Projects Page</div>
+                element: <Projects />
             },
             {
                 path: "documents",
-                element: <div>Documents Page</div>
+                element: <Documents />
             },
             {
                 path: "profile",
-                element: <User />
+                element: <Profile />
             },
             {
                 path: "settings",
-                element: <div>User Settings Page</div>
+                element: <Settings />
             }
         ]
     },
