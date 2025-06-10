@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import axios from "axios"
-import { useReactTable, getCoreRowModel, getExpandedRowModel, flexRender } from '@tanstack/react-table';
+import { useReactTable, getCoreRowModel, getExpandedRowModel, flexRender, getPaginationRowModel } from '@tanstack/react-table';
 import type { ColumnDef } from '@tanstack/react-table';
 import React from "react";
 
@@ -89,7 +89,13 @@ function Expandtable() {
     columns, // กำหนด columns ที่สร้างขึ้น
     getCoreRowModel: getCoreRowModel(), // ใช้สำหรับการแสดงผลข้อมูลหลัก
     getExpandedRowModel: getExpandedRowModel(), // ใช้สำหรับการขยายแถว
+    getPaginationRowModel: getPaginationRowModel(), // เพิ่มสำหรับ pagination
     getRowCanExpand: () => true, // ทุกแถวสามารถขยายได้
+    initialState: {
+      pagination: {
+        pageSize: 20, // กำหนดให้แสดง 20 รายการต่อหน้า
+      },
+    },
   });
 
   return (
@@ -202,6 +208,127 @@ function Expandtable() {
             ))}
           </tbody>
             </table>
+            
+            {/* Pagination Controls */}
+            <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
+              <div className="flex items-center justify-between">
+                {/* Page Info */}
+                <div className="flex items-center space-x-2 text-sm text-gray-700">
+                  <span>
+                    Showing {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1} to{' '}
+                    {Math.min(
+                      (table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
+                      table.getFilteredRowModel().rows.length
+                    )}{' '}
+                    of {table.getFilteredRowModel().rows.length} results
+                  </span>
+                </div>
+
+                {/* Pagination Buttons */}
+                <div className="flex items-center space-x-2">
+                  {/* First Page */}
+                  <button
+                    onClick={() => table.setPageIndex(0)}
+                    disabled={!table.getCanPreviousPage()}
+                    className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                    title="First page"
+                  >
+                    «
+                  </button>
+
+                  {/* Previous Page */}
+                  <button
+                    onClick={() => table.previousPage()}
+                    disabled={!table.getCanPreviousPage()}
+                    className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                    title="Previous page"
+                  >
+                    ‹
+                  </button>
+
+                  {/* Page Numbers */}
+                  <div className="flex items-center space-x-1">
+                    {(() => {
+                      const currentPage = table.getState().pagination.pageIndex + 1;
+                      const totalPages = table.getPageCount();
+                      const pages = [];
+                      
+                      // แสดงหน้าแรก
+                      if (currentPage > 3) {
+                        pages.push(1);
+                        if (currentPage > 4) pages.push('...');
+                      }
+                      
+                      // แสดงหน้าใกล้เคียง
+                      for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
+                        pages.push(i);
+                      }
+                      
+                      // แสดงหน้าสุดท้าย
+                      if (currentPage < totalPages - 2) {
+                        if (currentPage < totalPages - 3) pages.push('...');
+                        pages.push(totalPages);
+                      }
+                      
+                      return pages.map((page, index) => (
+                        page === '...' ? (
+                          <span key={`ellipsis-${index}`} className="px-2 text-gray-500">...</span>
+                        ) : (
+                          <button
+                            key={page}
+                            onClick={() => table.setPageIndex(Number(page) - 1)}
+                            className={`px-3 py-1 text-sm border rounded-md ${
+                              currentPage === page
+                                ? 'bg-blue-500 text-white border-blue-500'
+                                : 'border-gray-300 hover:bg-gray-100'
+                            }`}
+                          >
+                            {page}
+                          </button>
+                        )
+                      ));
+                    })()}
+                  </div>
+
+                  {/* Next Page */}
+                  <button
+                    onClick={() => table.nextPage()}
+                    disabled={!table.getCanNextPage()}
+                    className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                    title="Next page"
+                  >
+                    ›
+                  </button>
+
+                  {/* Last Page */}
+                  <button
+                    onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+                    disabled={!table.getCanNextPage()}
+                    className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                    title="Last page"
+                  >
+                    »
+                  </button>
+                </div>
+
+                {/* Page Size Selector */}
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-gray-700">Show:</span>
+                  <select
+                    value={table.getState().pagination.pageSize}
+                    onChange={(e) => table.setPageSize(Number(e.target.value))}
+                    className="px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    {[10, 20, 30, 50, 100].map((pageSize) => (
+                      <option key={pageSize} value={pageSize}>
+                        {pageSize}
+                      </option>
+                    ))}
+                  </select>
+                  <span className="text-sm text-gray-700">entries</span>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>
