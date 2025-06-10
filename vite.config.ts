@@ -8,7 +8,7 @@ export default defineConfig({
     tailwindcss(),
     react()
   ],
-  base: '/reactwebapi/',
+  base: '/',
   build: {
     chunkSizeWarningLimit: 10000,
     outDir: 'dist',

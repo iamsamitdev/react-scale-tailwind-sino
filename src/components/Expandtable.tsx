@@ -83,7 +83,7 @@ function Expandtable() {
           <span>ID</span>
           <button
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="ml-2 text-gray-400 hover:text-gray-600"
+            className="ml-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
           >
             {column.getIsSorted() === "asc" ? (
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -102,7 +102,7 @@ function Expandtable() {
         </div>
       ),
       accessorKey: 'id',
-      cell: ({ getValue }) => <span className="font-medium">{String(getValue())}</span>,
+      cell: ({ getValue }) => <span className="font-medium text-gray-900 dark:text-white">{String(getValue())}</span>,
       enableSorting: true,
       enableColumnFilter: true,
     },
@@ -112,7 +112,7 @@ function Expandtable() {
           <span>Title</span>
           <button
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="ml-2 text-gray-400 hover:text-gray-600"
+            className="ml-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
           >
             {column.getIsSorted() === "asc" ? (
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -131,7 +131,7 @@ function Expandtable() {
         </div>
       ),
       accessorKey: 'title',
-      cell: ({ getValue }) => <span className="font-medium text-gray-900">{String(getValue())}</span>,
+      cell: ({ getValue }) => <span className="font-medium text-gray-900 dark:text-white">{String(getValue())}</span>,
       enableSorting: true,
       enableColumnFilter: true,
       enableGlobalFilter: true,
@@ -140,7 +140,7 @@ function Expandtable() {
       header: 'Body',
       accessorKey: 'body',
       cell: ({ getValue }) => (
-        <span className="line-clamp-2 text-gray-600">{String(getValue())}</span>
+        <span className="line-clamp-2 text-gray-600 dark:text-gray-400">{String(getValue())}</span>
       ),
       enableSorting: false,
       enableColumnFilter: false,
@@ -150,7 +150,7 @@ function Expandtable() {
       header: 'User ID',
       accessorKey: 'userId',
       cell: ({ getValue }) => (
-        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
           User {String(getValue())}
         </span>
       ),
@@ -187,12 +187,12 @@ function Expandtable() {
 
   return (
     <div className="container mx-auto p-6">
-      <div className="bg-white rounded-lg shadow-lg">
-        <div className="p-6 border-b border-gray-200">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">Posts & Comments</h2>
-              <p className="text-gray-600 mt-1">Click on any row to expand and view comments</p>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Posts & Comments</h2>
+              <p className="text-gray-600 dark:text-gray-400 mt-1">Click on any row to expand and view comments</p>
             </div>
             
             {/* Search and Filter Controls */}
@@ -204,7 +204,7 @@ function Expandtable() {
                   value={globalFilter ?? ''}
                   onChange={(e) => setGlobalFilter(e.target.value)}
                   placeholder="Search all columns..."
-                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                  className="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
                 <svg 
                   className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" 
@@ -220,7 +220,7 @@ function Expandtable() {
               <select
                 value={(table.getColumn('userId')?.getFilterValue() as string) ?? ''}
                 onChange={(e) => table.getColumn('userId')?.setFilterValue(e.target.value || undefined)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               >
                 <option value="">All Users</option>
                 {Array.from({ length: 10 }, (_, i) => (
@@ -236,7 +236,7 @@ function Expandtable() {
                   setGlobalFilter('')
                   setColumnFilters([])
                 }}
-                className="px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+                className="px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors"
               >
                 Clear Filters
               </button>
@@ -245,15 +245,15 @@ function Expandtable() {
         </div>
         
         {error && (
-          <div className="mx-6 mt-4 p-4 bg-red-50 border border-red-200 rounded-md">
+          <div className="mx-6 mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
             <div className="flex">
               <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                <svg className="h-5 w-5 text-red-400 dark:text-red-300" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                 </svg>
               </div>
               <div className="ml-3">
-                <p className="text-sm text-red-800">{error}</p>
+                <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
               </div>
             </div>
           </div>
@@ -262,56 +262,56 @@ function Expandtable() {
         {loading ? (
           <div className="text-center py-12">
             <div className="animate-spin inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
-            <p className="mt-2 text-gray-600">Loading posts...</p>
+            <p className="mt-2 text-gray-600 dark:text-gray-400">Loading posts...</p>
           </div>
         ) : data.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-500">No posts available</p>
+            <p className="text-gray-500 dark:text-gray-400">No posts available</p>
           </div>
         ) : (
           <div className="overflow-hidden">
             {/* Column Filters */}
-            <div className="bg-gray-50 px-6 py-3 border-b border-gray-200">
+            <div className="bg-gray-50 dark:bg-gray-700 px-6 py-3 border-b border-gray-200 dark:border-gray-600">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Filter by ID</label>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Filter by ID</label>
                   <input
                     type="text"
                     value={(table.getColumn('id')?.getFilterValue() as string) ?? ''}
                     onChange={(e) => table.getColumn('id')?.setFilterValue(e.target.value || undefined)}
                     placeholder="Filter ID..."
-                    className="w-full px-3 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Filter by Title</label>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Filter by Title</label>
                   <input
                     type="text"
                     value={(table.getColumn('title')?.getFilterValue() as string) ?? ''}
                     onChange={(e) => table.getColumn('title')?.setFilterValue(e.target.value || undefined)}
                     placeholder="Filter title..."
-                    className="w-full px-3 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Filter by User ID</label>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Filter by User ID</label>
                   <input
                     type="text"
                     value={(table.getColumn('userId')?.getFilterValue() as string) ?? ''}
                     onChange={(e) => table.getColumn('userId')?.setFilterValue(e.target.value || undefined)}
                     placeholder="Filter user ID..."
-                    className="w-full px-3 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                   />
                 </div>
               </div>
             </div>
 
-            <table className="min-w-full divide-y divide-gray-200">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead>
                     {table.getHeaderGroups().map((headerGroup) => (
-                    <tr key={headerGroup.id} className="bg-gray-100 text-gray-700">
+                    <tr key={headerGroup.id} className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
                         {headerGroup.headers.map((header) => (
-                        <th key={header.id} className="py-3 px-4 border-b text-left font-semibold">
+                        <th key={header.id} className="py-3 px-4 border-b border-gray-200 dark:border-gray-600 text-left font-semibold">
                             {header.isPlaceholder
                               ? null
                               : flexRender(
@@ -327,7 +327,7 @@ function Expandtable() {
             {table.getRowModel().rows.map((row) => (
               <React.Fragment key={row.id}>
                 <tr
-                  className="hover:bg-gray-50 cursor-pointer transition-colors"
+                  className="hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors bg-white dark:bg-gray-800"
                   onClick={() => {
                     row.toggleExpanded();
                     if (!subData[row.original.id]) {
@@ -336,22 +336,22 @@ function Expandtable() {
                   }}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} className="py-3 px-4 border-b">
+                    <td key={cell.id} className="py-3 px-4 border-b border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </td>
                   ))}
                 </tr>
                 {row.getIsExpanded() && (
                   <tr>
-                    <td colSpan={columns.length} className="py-3 px-4 border-b bg-gray-50">
+                    <td colSpan={columns.length} className="py-3 px-4 border-b border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700">
                       {loadingComments[row.original.id] ? (
                         <div className="text-center py-4">
                           <div className="animate-spin inline-block w-6 h-6 border-4 border-blue-500 border-t-transparent rounded-full"></div>
-                          <span className="ml-2">Loading comments...</span>
+                          <span className="ml-2 text-gray-600 dark:text-gray-400">Loading comments...</span>
                         </div>
                       ) : subData[row.original.id] && subData[row.original.id].length > 0 ? (
                         <div className="p-4">
-                          <h4 className="font-semibold text-gray-700 mb-3 flex items-center">
+                          <h4 className="font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center">
                             <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
                             Comments ({subData[row.original.id].length})
                           </h4>
@@ -359,19 +359,19 @@ function Expandtable() {
                             {subData[row.original.id].map((comment) => (
                               <div
                                 key={comment.id}
-                                className="p-3 bg-white border border-gray-200 rounded-md shadow-sm hover:shadow-md transition-shadow"
+                                className="p-3 bg-white dark:bg-gray-600 border border-gray-200 dark:border-gray-500 rounded-md shadow-sm hover:shadow-md transition-shadow"
                               >
-                                <p className="text-sm font-medium text-gray-800 mb-1">
+                                <p className="text-sm font-medium text-gray-800 dark:text-gray-200 mb-1">
                                   {comment.name}
                                 </p>
-                                <p className="text-sm text-gray-600 mb-2">{comment.body}</p>
-                                <p className="text-xs text-blue-600">By: {comment.email}</p>
+                                <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">{comment.body}</p>
+                                <p className="text-xs text-blue-600 dark:text-blue-400">By: {comment.email}</p>
                               </div>
                             ))}
                           </div>
                         </div>
                       ) : (
-                        <div className="text-center text-gray-500 py-4">
+                        <div className="text-center text-gray-500 dark:text-gray-400 py-4">
                           <span>No comments available</span>
                         </div>
                       )}
@@ -384,10 +384,10 @@ function Expandtable() {
             </table>
             
             {/* Pagination Controls */}
-            <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
+            <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                 {/* Page Info */}
-                <div className="flex items-center space-x-2 text-sm text-gray-700">
+                <div className="flex items-center space-x-2 text-sm text-gray-700 dark:text-gray-300">
                   <span>
                     Showing {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1} to{' '}
                     {Math.min(
@@ -396,7 +396,7 @@ function Expandtable() {
                     )}{' '}
                     of {table.getFilteredRowModel().rows.length} results
                     {table.getFilteredRowModel().rows.length !== data.length && (
-                      <span className="text-blue-600">
+                      <span className="text-blue-600 dark:text-blue-400">
                         {' '}(filtered from {data.length} total)
                       </span>
                     )}
@@ -410,7 +410,7 @@ function Expandtable() {
                     <button
                       onClick={() => table.setPageIndex(0)}
                       disabled={!table.getCanPreviousPage()}
-                      className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                      className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-100 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
                       title="First page"
                     >
                       «
@@ -420,7 +420,7 @@ function Expandtable() {
                     <button
                       onClick={() => table.previousPage()}
                       disabled={!table.getCanPreviousPage()}
-                      className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                      className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-100 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
                       title="Previous page"
                     >
                       ‹
@@ -452,7 +452,7 @@ function Expandtable() {
                         
                         return pages.map((page, index) => (
                           page === '...' ? (
-                            <span key={`ellipsis-${index}`} className="px-2 text-gray-500">...</span>
+                            <span key={`ellipsis-${index}`} className="px-2 text-gray-500 dark:text-gray-400">...</span>
                           ) : (
                             <button
                               key={page}
@@ -460,7 +460,7 @@ function Expandtable() {
                               className={`px-3 py-1 text-sm border rounded-md ${
                                 currentPage === page
                                   ? 'bg-blue-500 text-white border-blue-500'
-                                  : 'border-gray-300 hover:bg-gray-100'
+                                  : 'border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300'
                               }`}
                             >
                               {page}
@@ -474,7 +474,7 @@ function Expandtable() {
                     <button
                       onClick={() => table.nextPage()}
                       disabled={!table.getCanNextPage()}
-                      className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                      className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-100 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
                       title="Next page"
                     >
                       ›
@@ -484,7 +484,7 @@ function Expandtable() {
                     <button
                       onClick={() => table.setPageIndex(table.getPageCount() - 1)}
                       disabled={!table.getCanNextPage()}
-                      className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                      className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-100 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
                       title="Last page"
                     >
                       »
@@ -493,11 +493,11 @@ function Expandtable() {
 
                   {/* Page Size Selector */}
                   <div className="flex items-center space-x-2">
-                    <span className="text-sm text-gray-700">Show:</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">Show:</span>
                     <select
                       value={table.getState().pagination.pageSize}
                       onChange={(e) => table.setPageSize(Number(e.target.value))}
-                      className="px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
                     >
                       {[10, 20, 30, 50, 100].map((pageSize) => (
                         <option key={pageSize} value={pageSize}>
@@ -505,7 +505,7 @@ function Expandtable() {
                         </option>
                       ))}
                     </select>
-                    <span className="text-sm text-gray-700">entries</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">entries</span>
                   </div>
                 </div>
               </div>
