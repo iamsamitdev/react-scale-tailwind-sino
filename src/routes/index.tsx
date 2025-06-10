@@ -19,6 +19,7 @@ import Documents from "../pages/dashboard/Documents"
 import Reports from "../pages/dashboard/Reports"
 import Settings from "../pages/dashboard/Settings"
 import Profile from "../pages/dashboard/Profile"
+import Product from "../pages/dashboard/Product"
 
 const router = createBrowserRouter([
     // Main route with layout
@@ -86,7 +87,7 @@ const router = createBrowserRouter([
             },
             {
                 path: "products",
-                element: <div>Products Page</div>
+                element: <Product />
             },
             {
                 path: "team",
@@ -141,7 +142,7 @@ const router = createBrowserRouter([
             },
             {
                 path: "products",
-                element: <div>Products Page</div>
+                element: <Product />
             },
             {
                 path: "projects",

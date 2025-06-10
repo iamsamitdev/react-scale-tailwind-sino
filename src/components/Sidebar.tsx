@@ -84,7 +84,7 @@ export default function Sidebar() {
           <div className="flex items-center justify-between px-6">
             {!isCollapsed && (
               <div className="flex items-center flex-shrink-0">
-                <Link to="/dashboard" className="flex items-center">
+                <Link to="/backend/admin/dashboard" className="flex items-center">
                   <img className="w-8" src="/images/wrlogo.png" alt="" />
                     <span className="ml-2 text-xl font-semibold text-gray-900 dark:text-white">WindReact</span>
                 </Link>
