@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router'
+import { getCurrentUser } from '../routes/ProtectedRoute'
 
 interface IconProps extends React.SVGProps<SVGSVGElement> {
   className?: string
@@ -10,18 +11,31 @@ export default function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   
-  // แยก Dashboard ออกมา
-  const dashboard = { name: 'Dashboard', path: '/dashboard', icon: HomeIcon }
+  // ดึงข้อมูล user และ role
+  const currentUser = getCurrentUser()
+  const userRole = currentUser?.role || 0
   
-  // เมนูหลัก
-  const mainMenus = [
-    { name: 'Products', path: '/dashboard/products', icon: ProductIcon },
-    { name: 'Team', path: '/dashboard/team', icon: TeamIcon },
-    { name: 'Projects', path: '/dashboard/projects', icon: ProjectIcon },
-    { name: 'Calendar', path: '/dashboard/calendar', icon: CalendarIcon },
-    { name: 'Documents', path: '/dashboard/documents', icon: DocumentIcon },
-    { name: 'Reports', path: '/dashboard/reports', icon: ReportIcon },
+  // แยก Dashboard ออกมา - ปรับ path ตาม role
+  const getDashboardPath = () => {
+    if (userRole === 1) return '/backend/admin/dashboard'
+    if (userRole === 2) return '/backend/user/dashboard'
+    return '/dashboard'
+  }
+  
+  const dashboard = { name: 'Dashboard', path: getDashboardPath(), icon: HomeIcon }
+  
+  // เมนูทั้งหมด
+  const allMenus = [
+    { name: 'Products', path: '/backend/products', icon: ProductIcon, roles: [1, 2] },
+    { name: 'Team', path: '/backend/team', icon: TeamIcon, roles: [1] },
+    { name: 'Projects', path: '/backend/projects', icon: ProjectIcon, roles: [1, 2] },
+    { name: 'Calendar', path: '/backend/calendar', icon: CalendarIcon, roles: [1] },
+    { name: 'Documents', path: '/backend/documents', icon: DocumentIcon, roles: [1, 2] },
+    { name: 'Reports', path: '/backend/reports', icon: ReportIcon, roles: [1] },
   ]
+  
+  // กรองเมนูตาม role
+  const mainMenus = allMenus.filter(menu => menu.roles.includes(userRole))
 
   const teams = [
     { name: 'Heroicons', path: '#heroicons', initial: 'H' },
@@ -115,8 +129,8 @@ export default function Sidebar() {
               ))}
             </div>
 
-            {/* Teams Section */}
-            {!isCollapsed && (
+            {/* Teams Section - เฉพาะ Admin (role 1) */}
+            {!isCollapsed && userRole === 1 && (
               <div className="pt-6">
                 <div className="px-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Your teams
@@ -143,10 +157,10 @@ export default function Sidebar() {
           {/* Settings - Fixed at bottom */}
           <div className="px-3 pb-4">
             <Link
-              to="/dashboard/settings"
+              to={userRole === 1 ? "/backend/admin/settings" : userRole === 2 ? "/backend/user/settings" : "/dashboard/settings"}
               onClick={handleMenuClick}
               className={`flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800 ${
-                location.pathname === '/dashboard/settings'
+                location.pathname.includes('/settings')
                   ? 'bg-indigo-50 text-indigo-600 dark:bg-gray-800 dark:text-white'
                   : ''
               }`}

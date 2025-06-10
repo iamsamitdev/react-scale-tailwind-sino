@@ -31,13 +31,13 @@ function Login() {
           const userRole = response.data.user.role
           if (userRole === 1) {
             // Admin (role 1) -> ไปหน้า admin
-            window.location.href = '/admin/dashboard'
+            window.location.href = '/backend/admin/dashboard'
           } else if (userRole === 2) {
             // User (role 2) -> ไปหน้า user
-            window.location.href = '/user/dashboard'
+            window.location.href = '/backend/user/dashboard'
           } else {
             // กรณีอื่นๆ ไปหน้าหลัก
-            window.location.href = '/dashboard'
+            window.location.href = '/backend/dashboard'
           }
         })
       } else {

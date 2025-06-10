@@ -58,7 +58,7 @@ const router = createBrowserRouter([
     },
     // Admin route with layout (เฉพาะ Admin - role 1)
     {
-        path: "/admin",
+        path: "/backend/admin",
         element: (
             <ProtectedRoute 
                 requiredRole={1} 
@@ -85,7 +85,7 @@ const router = createBrowserRouter([
     },
     // User backend route (เฉพาะ User - role 2)
     {
-        path: "/user",
+        path: "/backend/user",
         element: (
             <ProtectedRoute 
                 requiredRole={2} 
