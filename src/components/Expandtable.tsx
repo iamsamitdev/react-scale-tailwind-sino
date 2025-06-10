@@ -1,64 +1,84 @@
 import { useState, useEffect } from "react"
 import axios from "axios"
-import { useReactTable, getCoreRowModel, getExpandedRowModel } from '@tanstack/react-table';
+import { useReactTable, getCoreRowModel, getExpandedRowModel, flexRender } from '@tanstack/react-table';
+import type { ColumnDef } from '@tanstack/react-table';
+import React from "react";
+
+// กำหนด interface สำหรับข้อมูล
+interface Post {
+  id: number;
+  title: string;
+  body: string;
+  userId: number;
+}
+
+interface Comment {
+  id: number;
+  postId: number;
+  name: string;
+  email: string;
+  body: string;
+}
 
 function Expandtable() {
-
   // State สำหรับข้อมูลตารางและข้อมูลย่อย
-  const [data, setData] = useState([])
-  const [subData, setSubData] = useState({})
+  const [data, setData] = useState<Post[]>([])
+  const [subData, setSubData] = useState<Record<number, Comment[]>>({})
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(false)
+  const [loadingComments, setLoadingComments] = useState<Record<number, boolean>>({})
+  const [error, setError] = useState<string | null>(null)
 
   // ดึงข้อมูลหลัก (posts) เมื่อ component mount
   useEffect(() => {
     const fetchPosts = async () => {
-      // ให้ loading เป็น true ก่อนเริ่มดึงข้อมูล
       setLoading(true)
+      setError(null)
       try {
-        const response = await axios.get("https://jsonplaceholder.typicode.com/posts")
-        setData(response.data) // เก็บข้อมูลหลักใน state
-        setLoading(false) // เปลี่ยน loading เป็น false หลังจากดึงข้อมูลเสร็จ
+        const response = await axios.get<Post[]>("https://jsonplaceholder.typicode.com/posts")
+        setData(response.data)
       } catch (err) {
-        // ถ้ามีข้อผิดพลาด ให้เก็บไว้ใน state
-        setError(true);
-        console.error(err);
+        setError('Failed to fetch posts. Please try again.')
+        console.error('Error fetching posts:', err)
+      } finally {
+        setLoading(false)
       }
-      setLoading(false) // เปลี่ยน loading เป็น false หลังจากดึงข้อมูลเสร็จ
     }
-    // เรียกใช้ฟังก์ชันดึงข้อมูล
     fetchPosts()
   }, [])
 
   // ฟังก์ชันดึงข้อมูลย่อย (comments) สำหรับโพสต์ที่เลือก
   const fetchComments = async (postId: number) => {
-    setLoading(true);
+    // ถ้ามี comments แล้ว ไม่ต้องดึงซ้ำ
+    if (subData[postId]) return
+
+    setLoadingComments(prev => ({ ...prev, [postId]: true }))
     try {
-      const response = await axios.get(`https://jsonplaceholder.typicode.com/comments?postId=${postId}`)
-      setSubData(prev => ({ ...prev, [postId]: response.data })) // เก็บข้อมูลย่อยใน state
+      const response = await axios.get<Comment[]>(`https://jsonplaceholder.typicode.com/comments?postId=${postId}`)
+      setSubData(prev => ({ ...prev, [postId]: response.data }))
     } catch (err) {
-      setError(true);
-      console.error(err);
+      console.error('Error fetching comments:', err)
+      setSubData(prev => ({ ...prev, [postId]: [] })) // Set empty array เมื่อเกิด error
+    } finally {
+      setLoadingComments(prev => ({ ...prev, [postId]: false }))
     }
-    setLoading(false); // เปลี่ยน loading เป็น false หลังจากดึงข้อมูลเสร็จ
   }
 
-  // กำหนด columns สำหรับตาราง
-  const columns = [
+  const columns: ColumnDef<Post>[] = [
     {
-        header: "ID",
-        accessorKey: 'id',
-        cell: ({ getValue }: any ) => <span className="font-medium">{getValue()}</span>,
+      header: "ID",
+      accessorKey: 'id',
+      cell: ({ getValue }) => <span className="font-medium">{String(getValue())}</span>,
     },
     {
       header: 'Title',
       accessorKey: 'title',
+      cell: ({ getValue }) => <span className="font-medium text-gray-900">{String(getValue())}</span>,
     },
     {
       header: 'Body',
       accessorKey: 'body',
-      cell: ({ getValue }: any) => (
-        <span className="line-clamp-2">{getValue()}</span> // จำกัดการแสดงผล
+      cell: ({ getValue }) => (
+        <span className="line-clamp-2 text-gray-600">{String(getValue())}</span>
       ),
     },
   ]
@@ -73,15 +93,118 @@ function Expandtable() {
   });
 
   return (
-    <div className="container mx-auto p-4">
-        {error && <div className="text-red-500 text-center mb-4">{error}</div>}
-        {loading && data.length === 0 ? (
-            <div className="text-center">
-                <p>Loading...</p>
-                </div>
-        ) : (
-            <div>xxx</div>
+    <div className="container mx-auto p-6">
+      <div className="bg-white rounded-lg shadow-lg">
+        <div className="p-6 border-b border-gray-200">
+          <h2 className="text-2xl font-bold text-gray-900">Posts & Comments</h2>
+          <p className="text-gray-600 mt-1">Click on any row to expand and view comments</p>
+        </div>
+        
+        {error && (
+          <div className="mx-6 mt-4 p-4 bg-red-50 border border-red-200 rounded-md">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-red-800">{error}</p>
+              </div>
+            </div>
+          </div>
         )}
+        
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="animate-spin inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+            <p className="mt-2 text-gray-600">Loading posts...</p>
+          </div>
+        ) : data.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-500">No posts available</p>
+          </div>
+        ) : (
+          <div className="overflow-hidden">
+            <table className="min-w-full divide-y divide-gray-200">
+                <thead>
+                    {table.getHeaderGroups().map((headerGroup) => (
+                    <tr key={headerGroup.id} className="bg-gray-100 text-gray-700">
+                        {headerGroup.headers.map((header) => (
+                        <th key={header.id} className="py-3 px-4 border-b text-left font-semibold">
+                            {header.isPlaceholder
+                              ? null
+                              : flexRender(
+                                  header.column.columnDef.header,
+                                  header.getContext()
+                                )}
+                    </th>
+                    ))}
+                    </tr>
+                    ))}
+                </thead>
+                <tbody>
+            {table.getRowModel().rows.map((row) => (
+              <React.Fragment key={row.id}>
+                <tr
+                  className="hover:bg-gray-50 cursor-pointer transition-colors"
+                  onClick={() => {
+                    row.toggleExpanded();
+                    if (!subData[row.original.id]) {
+                      fetchComments(row.original.id);
+                    }
+                  }}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <td key={cell.id} className="py-3 px-4 border-b">
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </td>
+                  ))}
+                </tr>
+                {row.getIsExpanded() && (
+                  <tr>
+                    <td colSpan={columns.length} className="py-3 px-4 border-b bg-gray-50">
+                      {loadingComments[row.original.id] ? (
+                        <div className="text-center py-4">
+                          <div className="animate-spin inline-block w-6 h-6 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+                          <span className="ml-2">Loading comments...</span>
+                        </div>
+                      ) : subData[row.original.id] && subData[row.original.id].length > 0 ? (
+                        <div className="p-4">
+                          <h4 className="font-semibold text-gray-700 mb-3 flex items-center">
+                            <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                            Comments ({subData[row.original.id].length})
+                          </h4>
+                          <div className="space-y-3 max-h-60 overflow-y-auto">
+                            {subData[row.original.id].map((comment) => (
+                              <div
+                                key={comment.id}
+                                className="p-3 bg-white border border-gray-200 rounded-md shadow-sm hover:shadow-md transition-shadow"
+                              >
+                                <p className="text-sm font-medium text-gray-800 mb-1">
+                                  {comment.name}
+                                </p>
+                                <p className="text-sm text-gray-600 mb-2">{comment.body}</p>
+                                <p className="text-xs text-blue-600">By: {comment.email}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-center text-gray-500 py-4">
+                          <span>No comments available</span>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
+            ))}
+          </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
