@@ -6,6 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:xampp": "tsc -b && vite build && npm run copy:htaccess",
+    "copy:htaccess": "cp public/.htaccess dist/",
+    "deploy:xampp": "npm run build:xampp && echo 'Build completed! Copy dist folder contents to C:/xampp/htdocs/reactwebapi/'",
     "lint": "eslint .",
     "preview": "vite preview"
   },

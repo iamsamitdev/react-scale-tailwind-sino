@@ -11,7 +11,6 @@ import Register from "../pages/Register"
 import BackendLayout from "../layouts/BackendLayout"
 import Dashboard from "../pages/dashboard/Dashboard"
 import ProtectedRoute from "./ProtectedRoute"
-import User from "../pages/dashboard/User"
 import Team from "../pages/dashboard/Team"
 import Projects from "../pages/dashboard/Projects"
 import Calendar from "../pages/dashboard/Calendar"
@@ -20,6 +19,9 @@ import Reports from "../pages/dashboard/Reports"
 import Settings from "../pages/dashboard/Settings"
 import Profile from "../pages/dashboard/Profile"
 import Product from "../pages/dashboard/Product"
+
+// กำหนด basename สำหรับ XAMPP deployment
+const basename = import.meta.env.PROD ? '/reactwebapi' : ''
 
 const router = createBrowserRouter([
     // Main route with layout
@@ -167,7 +169,9 @@ const router = createBrowserRouter([
         path: "*",
         element: <Notfound />
     }
-])
+], {
+    basename: basename
+})
 
 export const AppRouter = () => {
     return (

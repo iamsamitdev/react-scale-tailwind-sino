@@ -8,4 +8,17 @@ export default defineConfig({
     tailwindcss(),
     react()
   ],
+  base: '/reactwebapi/',
+  build: {
+    chunkSizeWarningLimit: 10000,
+    outDir: 'dist',
+    assetsDir: 'assets',
+  },
+  server: {
+    port: 3000,
+    open: true
+  },
+  preview: {
+    port: 4173
+  }
 })
