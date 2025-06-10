@@ -12,6 +12,7 @@ import BackendLayout from "../layouts/BackendLayout"
 import Dashboard from "../pages/dashboard/Dashboard"
 import ProtectedRoute from "./ProtectedRoute"
 import User from "../pages/dashboard/User"
+import Team from "../pages/dashboard/Team"
 
 const router = createBrowserRouter([
     // Main route with layout
@@ -78,8 +79,36 @@ const router = createBrowserRouter([
                 element: <Dashboard />
             },
             {
+                path: "products",
+                element: <div>Products Page</div>
+            },
+            {
+                path: "team",
+                element: <Team />
+            },
+            {
+                path: "projects",
+                element: <div>Projects Page</div>
+            },
+            {
+                path: "calendar",
+                element: <div>Calendar Page</div>
+            },
+            {
+                path: "documents",
+                element: <div>Documents Page</div>
+            },
+            {
+                path: "reports",
+                element: <div>Reports Page</div>
+            },
+            {
                 path: "user",
                 element: <User />
+            },
+            {
+                path: "settings",
+                element: <div>Admin Settings Page</div>
             }
         ]
     },
@@ -105,8 +134,24 @@ const router = createBrowserRouter([
                 element: <Dashboard />
             },
             {
+                path: "products",
+                element: <div>Products Page</div>
+            },
+            {
+                path: "projects",
+                element: <div>Projects Page</div>
+            },
+            {
+                path: "documents",
+                element: <div>Documents Page</div>
+            },
+            {
                 path: "profile",
                 element: <User />
+            },
+            {
+                path: "settings",
+                element: <div>User Settings Page</div>
             }
         ]
     },

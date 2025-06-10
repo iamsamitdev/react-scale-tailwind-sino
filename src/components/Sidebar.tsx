@@ -24,14 +24,19 @@ export default function Sidebar() {
   
   const dashboard = { name: 'Dashboard', path: getDashboardPath(), icon: HomeIcon }
   
-  // เมนูทั้งหมด
+  // เมนูทั้งหมด - กำหนด path ตาม role
+  const getMenuPath = (menuName: string) => {
+    const basePath = userRole === 1 ? '/backend/admin' : '/backend/user'
+    return `${basePath}/${menuName.toLowerCase()}`
+  }
+  
   const allMenus = [
-    { name: 'Products', path: '/backend/products', icon: ProductIcon, roles: [1, 2] },
-    { name: 'Team', path: '/backend/team', icon: TeamIcon, roles: [1] },
-    { name: 'Projects', path: '/backend/projects', icon: ProjectIcon, roles: [1, 2] },
-    { name: 'Calendar', path: '/backend/calendar', icon: CalendarIcon, roles: [1] },
-    { name: 'Documents', path: '/backend/documents', icon: DocumentIcon, roles: [1, 2] },
-    { name: 'Reports', path: '/backend/reports', icon: ReportIcon, roles: [1] },
+    { name: 'Products', path: getMenuPath('products'), icon: ProductIcon, roles: [1, 2] },
+    { name: 'Team', path: getMenuPath('team'), icon: TeamIcon, roles: [1] },
+    { name: 'Projects', path: getMenuPath('projects'), icon: ProjectIcon, roles: [1, 2] },
+    { name: 'Calendar', path: getMenuPath('calendar'), icon: CalendarIcon, roles: [1] },
+    { name: 'Documents', path: getMenuPath('documents'), icon: DocumentIcon, roles: [1, 2] },
+    { name: 'Reports', path: getMenuPath('reports'), icon: ReportIcon, roles: [1] },
   ]
   
   // กรองเมนูตาม role
@@ -93,6 +98,27 @@ export default function Sidebar() {
               {isCollapsed ? <ChevronRightIcon className="w-5 h-5" /> : <ChevronLeftIcon className="w-5 h-5" />}
             </button>
           </div>
+
+          {/* User Info */}
+          {!isCollapsed && currentUser && (
+            <div className="px-6 py-3 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex items-center">
+                <div className="w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center">
+                  <span className="text-white text-sm font-medium">
+                    {currentUser.fullname?.charAt(0) || 'U'}
+                  </span>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">
+                    {currentUser.fullname || 'User'}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {userRole === 1 ? 'Admin' : 'User'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Main Navigation */}
           <nav className="flex-1 px-3 mt-5">
@@ -157,7 +183,7 @@ export default function Sidebar() {
           {/* Settings - Fixed at bottom */}
           <div className="px-3 pb-4">
             <Link
-              to={userRole === 1 ? "/backend/admin/settings" : userRole === 2 ? "/backend/user/settings" : "/dashboard/settings"}
+              to={userRole === 1 ? "/backend/admin/settings" : userRole === 2 ? "/backend/user/settings" : "/dashboard"}
               onClick={handleMenuClick}
               className={`flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800 ${
                 location.pathname.includes('/settings')
